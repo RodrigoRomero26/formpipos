@@ -758,9 +758,9 @@
 		<div class="popup-overlay" id="popupOverlay">
 			<div class="popup-content" id="popupContent">
 				<div class="popup-icon" id="popupIcon">✓</div>
-				<div class="popup-title" id="popupTitle">¡Éxito!</div>
+				<div class="popup-title" id="popupTitle">Success!</div>
 				<div class="popup-message" id="popupMessage">
-					Tu solicitud ha sido enviada correctamente
+					Your request has been sent successfully
 				</div>
 			</div>
 		</div>
@@ -849,7 +849,7 @@
 						type="file"
 						id="referencias-imagen"
 						name="referencias-imagen"
-						accept="image/*"
+						accept="image/jpeg,image/jpg,image/png,image/webp,image/bmp"
 						multiple
 						data-max="5" />
 					<button type="button" class="custom-file-button" onclick="document.getElementById('referencias-imagen').click()">
@@ -881,7 +881,7 @@
 						type="file"
 						id="pose-imagen"
 						name="pose-imagen"
-						accept="image/*"
+						accept="image/jpeg,image/jpg,image/png,image/webp,image/bmp"
 						multiple
 						data-max="5" />
 					<button type="button" class="custom-file-button" onclick="document.getElementById('pose-imagen').click()">
@@ -915,7 +915,7 @@
 						type="file"
 						id="outfit-imagen"
 						name="outfit-imagen"
-						accept="image/*"
+						accept="image/jpeg,image/jpg,image/png,image/webp,image/bmp"
 						multiple
 						data-max="5" />
 					<button type="button" class="custom-file-button" onclick="document.getElementById('outfit-imagen').click()">
@@ -1105,12 +1105,28 @@
 							return;
 						}
 
-						// Add new files to storage
-						files.forEach((file) => {
-							if (file.type.startsWith("image/")) {
-								fileStorage[inputId].push(file);
-							}
-						});
+					// Add new files to storage
+					const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/bmp"];
+					const rejectedFiles = [];
+					
+					files.forEach((file) => {
+						if (file.type === "image/gif") {
+							rejectedFiles.push(`${file.name} (GIFs are not allowed)`);
+						} else if (allowedTypes.includes(file.type.toLowerCase())) {
+							fileStorage[inputId].push(file);
+						} else if (file.type.startsWith("image/")) {
+							rejectedFiles.push(`${file.name} (format not supported)`);
+						} else {
+							rejectedFiles.push(`${file.name} (not an image)`);
+						}
+					});
+
+					// Show alert if any files were rejected
+					if (rejectedFiles.length > 0) {
+						alert(
+							`The following files were rejected:\n${rejectedFiles.join("\n")}\n\nOnly JPEG, PNG, WebP, and BMP images are allowed.`
+						);
+					}
 
 						// Update preview
 						updateFilePreview(inputId, previewId);
@@ -1346,13 +1362,13 @@
 						}
 					}
 
-					if (response.ok) {
-						// Show success popup
-						showPopup(
-							"success",
-							"¡Éxito!",
-							"Tu solicitud ha sido enviada correctamente"
-						);
+				if (response.ok) {
+					// Show success popup
+					showPopup(
+						"success",
+						"Success!",
+						"Your request has been sent successfully"
+					);
 
 						// Show inline success message as well
 						successMessage.classList.add("show");
@@ -1379,13 +1395,13 @@
 				} catch (error) {
 					console.error("Error:", error);
 
-					// Show error popup
-					showPopup(
-						"error",
-						"Error",
-						error.message ||
-							"Error al enviar el formulario. Por favor, intenta de nuevo."
-					);
+				// Show error popup
+				showPopup(
+					"error",
+					"Error",
+					error.message ||
+						"Error sending the form. Please try again."
+				);
 
 					// Show inline error message as well
 					errorMessage.textContent =
